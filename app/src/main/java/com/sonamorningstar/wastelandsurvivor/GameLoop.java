@@ -7,8 +7,8 @@ public class GameLoop extends Thread {
     private static final double MAX_UPS = 60.0;
     private static final double UPS_PERIOD = 1E+3 / MAX_UPS;
     private boolean isRunning;
-    private Game game;
-    private SurfaceHolder surfaceHolder;
+    private final Game game;
+    private final SurfaceHolder surfaceHolder;
 
     private double averageUPS;
     private double averageFPS;
@@ -52,15 +52,15 @@ public class GameLoop extends Thread {
                 synchronized (surfaceHolder) {
                     game.update();
                     updateCount++;
-                    game.draw(canvas);
                 }
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
             } finally {
                 if (canvas != null) {
                     try {
-                        surfaceHolder.unlockCanvasAndPost(canvas);
+                        game.draw(canvas);
                         frameCount++;
+                        surfaceHolder.unlockCanvasAndPost(canvas);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
