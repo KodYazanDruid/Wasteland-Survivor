@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import androidx.core.content.ContextCompat;
 
 import com.sonamorningstar.wastelandsurvivor.R;
+import com.sonamorningstar.wastelandsurvivor.ui.Joystick;
 import com.sonamorningstar.wastelandsurvivor.world.Position;
 
 public class Player extends LivingEntity {
@@ -25,6 +26,10 @@ public class Player extends LivingEntity {
 
     @Override
     public void update() {
+        super.update();
+    }
 
+    public void handleJoystick(Joystick joystick) {
+        setDeltaMovement(joystick.getActuatorX() * moveSpeed, joystick.getActuatorY() * moveSpeed);
     }
 }

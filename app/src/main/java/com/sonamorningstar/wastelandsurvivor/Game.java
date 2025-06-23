@@ -10,23 +10,43 @@ import android.view.SurfaceView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
+import com.sonamorningstar.wastelandsurvivor.ui.Joystick;
 import com.sonamorningstar.wastelandsurvivor.world.Position;
+import com.sonamorningstar.wastelandsurvivor.world.entity.Enemy;
+import com.sonamorningstar.wastelandsurvivor.world.entity.Entity;
 import com.sonamorningstar.wastelandsurvivor.world.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Game extends SurfaceView implements SurfaceHolder.Callback {
     private final GameLoop gameLoop;
     private final Player player;
+    private final Joystick joystick;
+
+    private final List<Entity> entities = new ArrayList<>();
     public Game(Context context) {
         super(context);
         SurfaceHolder holder = getHolder();
         holder.addCallback(this);
         this.gameLoop = new GameLoop(this, holder);
         this.player = new Player(context);
+        player.setPosition(new Position(150, 150));
+        addEntity(player);
+        Enemy enemy = new Enemy(context);
+        enemy.setTarget(player);
+        enemy.setPosition(new Position(1000, 500));
+        addEntity(enemy);
+        this.joystick = new Joystick(275, 700, 175, 85);
         setFocusable(true);
     }
 
     public void update() {
-        player.update();
+        joystick.update();
+        for (Entity entity : entities) {
+            entity.update();
+        }
+        player.handleJoystick(joystick);
     }
 
     @Override
@@ -44,20 +64,29 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
+    public void addEntity(Entity entity) {
+        entity.addedToWorld();
+        entities.add(entity);
+        entity.entitySpawned(this);
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                if (joystick.checkPressed(event.getX(), event.getY())) {
+                    joystick.setPressed(true);
+                }
+                return true;
             case MotionEvent.ACTION_MOVE:
-                float x = event.getX();
-                float y = event.getY();
-                player.setPosition(new Position(x, y));
+                if (joystick.isPressed()) {
+                    joystick.setActuator(event.getX(), event.getY());
+                }
                 return true;
             case MotionEvent.ACTION_UP:
-                // Handle touch release if needed
-                break;
-            default:
-                return false;
+                joystick.setPressed(false);
+                joystick.resetActuator();
+                return true;
         }
 
         return super.onTouchEvent(event);
@@ -69,7 +98,19 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         drawUPS(canvas);
         drawFPS(canvas);
 
-        player.draw(canvas);
+        for (Entity entity : entities) {
+            double x = entity.getPosition().getX();
+            double y = entity.getPosition().getY();
+            double rotation = entity.getRotation();
+            Paint paint = new Paint();
+            paint.setTextSize(50);
+            paint.setColor(ContextCompat.getColor(getContext(), R.color.white));
+            canvas.drawText("X: " + x, (float) x, (float) y - 140, paint);
+            canvas.drawText("Y: " + y, (float) x, (float) y - 100, paint);
+            canvas.drawText("Rotation: " + rotation, (float) x, (float) y - 60, paint);
+            entity.draw(canvas);
+        }
+        joystick.draw(canvas);
     }
 
     public void drawUPS(Canvas canvas) {
