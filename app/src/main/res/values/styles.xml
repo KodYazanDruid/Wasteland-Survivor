@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme -->
+    <style name="Theme.WastelandSurvivor.NoBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Other theme attributes -->
+    </style>
+
+    <!-- Fullscreen theme that hides system bars -->
+    <style name="Theme.WastelandSurvivor.NoBar.Fullscreen" parent="Theme.WastelandSurvivor.NoBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+</resources>

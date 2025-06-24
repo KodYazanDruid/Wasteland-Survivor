@@ -10,43 +10,58 @@ import android.view.SurfaceView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
+import com.sonamorningstar.wastelandsurvivor.registry.AllItems;
 import com.sonamorningstar.wastelandsurvivor.ui.Joystick;
 import com.sonamorningstar.wastelandsurvivor.world.Position;
 import com.sonamorningstar.wastelandsurvivor.world.entity.Enemy;
 import com.sonamorningstar.wastelandsurvivor.world.entity.Entity;
+import com.sonamorningstar.wastelandsurvivor.world.entity.ItemEntity;
 import com.sonamorningstar.wastelandsurvivor.world.entity.Player;
+import com.sonamorningstar.wastelandsurvivor.world.entity.projectile.LaserProjectile;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Game extends SurfaceView implements SurfaceHolder.Callback {
     private final GameLoop gameLoop;
     private final Player player;
     private final Joystick joystick;
 
-    private final List<Entity> entities = new ArrayList<>();
+    public long ticks;
+
+    private final List<Entity> entities = new CopyOnWriteArrayList<>();
+
     public Game(Context context) {
         super(context);
         SurfaceHolder holder = getHolder();
         holder.addCallback(this);
         this.gameLoop = new GameLoop(this, holder);
-        this.player = new Player(context);
+        this.player = new Player(this, context);
         player.setPosition(new Position(150, 150));
         addEntity(player);
-        Enemy enemy = new Enemy(context);
+        Enemy enemy = new Enemy(this, context);
         enemy.setTarget(player);
         enemy.setPosition(new Position(1000, 500));
         addEntity(enemy);
+        ItemEntity appleEntity = new ItemEntity(AllItems.APPLE.createStack(1), this, context);
+        appleEntity.setPosition(new Position(500, 500));
+        addEntity(appleEntity);
         this.joystick = new Joystick(275, 700, 175, 85);
         setFocusable(true);
     }
 
+    public double getDeltaTime() {
+        return gameLoop.getDeltaTime();
+    }
+
     public void update() {
+        ticks++;
         joystick.update();
-        for (Entity entity : entities) {
-            entity.update();
-        }
         player.handleJoystick(joystick);
+        for (Entity entity : entities) {
+            if (!entity.markedForRemoval) entity.update(this);
+            else removeEntity(entity);
+        }
     }
 
     @Override
@@ -65,18 +80,28 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void addEntity(Entity entity) {
-        entity.addedToWorld();
+        entity.addedToWorld(this);
         entities.add(entity);
         entity.entitySpawned(this);
+    }
+    public void removeEntity(Entity entity) {
+        entity.aboutToBeRemoved(this);
+        entities.remove(entity);
+    }
+
+    public List<Entity> getEntities() {
+        return entities;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                if (joystick.checkPressed(event.getX(), event.getY())) {
+                if (joystick.isPressed()) {
+                    addEntity(new LaserProjectile(player, this, getContext()));
+                } else if (joystick.checkPressed(event.getX(), event.getY())) {
                     joystick.setPressed(true);
-                }
+                } else addEntity(new LaserProjectile(player, this, getContext()));
                 return true;
             case MotionEvent.ACTION_MOVE:
                 if (joystick.isPressed()) {
@@ -99,16 +124,16 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         drawFPS(canvas);
 
         for (Entity entity : entities) {
-            double x = entity.getPosition().getX();
-            double y = entity.getPosition().getY();
-            double rotation = entity.getRotation();
-            Paint paint = new Paint();
-            paint.setTextSize(50);
-            paint.setColor(ContextCompat.getColor(getContext(), R.color.white));
-            canvas.drawText("X: " + x, (float) x, (float) y - 140, paint);
-            canvas.drawText("Y: " + y, (float) x, (float) y - 100, paint);
-            canvas.drawText("Rotation: " + rotation, (float) x, (float) y - 60, paint);
-            entity.draw(canvas);
+//            double x = entity.getPosition().getX();
+//            double y = entity.getPosition().getY();
+//            double rotation = entity.getRotation();
+//            Paint paint = new Paint();
+//            paint.setTextSize(50);
+//            paint.setColor(ContextCompat.getColor(getContext(), R.color.white));
+//            canvas.drawText("X: " + x, (float) x, (float) y - 140, paint);
+//            canvas.drawText("Y: " + y, (float) x, (float) y - 100, paint);
+//            canvas.drawText("Rotation: " + rotation, (float) x, (float) y - 60, paint);
+            if (!entity.markedForRemoval) entity.draw(canvas);
         }
         joystick.draw(canvas);
     }

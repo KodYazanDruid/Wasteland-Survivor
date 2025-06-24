@@ -6,25 +6,29 @@ import android.graphics.Paint;
 
 import androidx.core.content.ContextCompat;
 
+import com.sonamorningstar.wastelandsurvivor.Game;
 import com.sonamorningstar.wastelandsurvivor.R;
+import com.sonamorningstar.wastelandsurvivor.world.BoundingCircle;
 
 public class Enemy extends LivingEntity {
     private Entity target;
 
-    public Enemy(Context context) {
-        super(context);
+    public Enemy(Game game, Context context) {
+        super(game, context, new BoundingCircle(0, 0, 30));
     }
 
     @Override
     public void draw(Canvas canvas) {
         Paint paint = new Paint();
         paint.setColor(ContextCompat.getColor(context, R.color.teal_700));
-        canvas.drawCircle((float)getPosition().getX(), (float)getPosition().getY(), 30, paint);
+        BoundingCircle bounds = (BoundingCircle) collider;
+        canvas.drawCircle((float)getPosition().getX(), (float)getPosition().getY(), (float)bounds.getRadius(), paint);
+        super.draw(canvas);
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void update(Game game) {
+        super.update(game);
         if (target instanceof Player) {
             double dist = getDistance(target);
             setDeltaMovement((target.getPosition().getX() - position.getX()) / dist * moveSpeed * 0.6,

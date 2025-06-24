@@ -12,6 +12,7 @@ public class GameLoop extends Thread {
 
     private double averageUPS;
     private double averageFPS;
+    private double deltaTime;
 
     public GameLoop(Game game, SurfaceHolder holder) {
         this.game = game;
@@ -24,6 +25,10 @@ public class GameLoop extends Thread {
 
     public double getAverageFPS() {
         return averageFPS;
+    }
+
+    public double getDeltaTime() {
+        return deltaTime;
     }
 
     public void startLoop() {
@@ -60,9 +65,10 @@ public class GameLoop extends Thread {
                     try {
                         game.draw(canvas);
                         frameCount++;
-                        surfaceHolder.unlockCanvasAndPost(canvas);
                     } catch (Exception e) {
                         e.printStackTrace();
+                    } finally {
+                        surfaceHolder.unlockCanvasAndPost(canvas);
                     }
                 }
             }
@@ -86,6 +92,7 @@ public class GameLoop extends Thread {
 
 
             elapsedTime = System.currentTimeMillis() - startTime;
+            deltaTime = elapsedTime;
             if (elapsedTime >= 1000) {
                 averageUPS = updateCount / (elapsedTime * 1E-3);
                 averageFPS = frameCount / (elapsedTime * 1E-3);

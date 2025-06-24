@@ -6,12 +6,15 @@ import android.graphics.Paint;
 
 import androidx.core.content.ContextCompat;
 
+import com.sonamorningstar.wastelandsurvivor.Game;
 import com.sonamorningstar.wastelandsurvivor.R;
 import com.sonamorningstar.wastelandsurvivor.registry.ProjectileType;
+import com.sonamorningstar.wastelandsurvivor.world.BoundingCircle;
+import com.sonamorningstar.wastelandsurvivor.world.entity.Entity;
 
 public class BulletProjectile extends Projectile {
-    public BulletProjectile(Context context) {
-        super(ProjectileType.BULLET, context);
+    public BulletProjectile(Entity owner, Game game, Context context) {
+        super(ProjectileType.BULLET, game, owner, context, new BoundingCircle(0, 0, 5));
     }
 
     @Override
@@ -24,7 +27,7 @@ public class BulletProjectile extends Projectile {
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void update(Game game) {
+        super.update(game);
     }
 }

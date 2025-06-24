@@ -5,12 +5,17 @@ import android.graphics.Canvas;
 
 import com.sonamorningstar.wastelandsurvivor.Game;
 import com.sonamorningstar.wastelandsurvivor.GameLoop;
+import com.sonamorningstar.wastelandsurvivor.world.BoundingBox;
+import com.sonamorningstar.wastelandsurvivor.world.BoundingCircle;
+import com.sonamorningstar.wastelandsurvivor.world.Collider;
 import com.sonamorningstar.wastelandsurvivor.world.Position;
 
 public abstract class Entity {
     protected String name;
     protected Position position = Position.ORIGIN;
     protected Context context;
+    protected final Game game;
+    protected final Collider collider;
     // 0: left, 90: up, 180: right, 270: down
     private double rotation = 0; // Rotation in degrees (0-360), Counter-clockwise.
 
@@ -20,8 +25,12 @@ public abstract class Entity {
     protected double velocityX = 0;
     protected double velocityY = 0;
 
-    public Entity(Context context) {
+    public boolean markedForRemoval = false;
+
+    public Entity(Game game, Context context, Collider collider) {
+        this.game = game;
         this.context = context;
+        this.collider = collider;
     }
 
     public Context getContext() {
@@ -32,17 +41,28 @@ public abstract class Entity {
         return rotation;
     }
 
+    public Collider getCollider() {
+        return collider;
+    }
+
     public void setRotation(double rotation) {
         this.rotation = rotation % 360;
     }
 
-    public abstract void draw(Canvas canvas);
+    public void draw(Canvas canvas) {
+//        if (collider != null) {
+//            collider.drawDebug(canvas);
+//        }
+    }
 
-    public void update() {
+    public void update(Game game) {
         updateMovement();
     }
 
-    public void addedToWorld() {
+    public void addedToWorld(Game game) {
+
+    }
+    public void aboutToBeRemoved(Game game) {
 
     }
 
@@ -64,6 +84,13 @@ public abstract class Entity {
             if (rotation < 0) {
                 setRotation(rotation + 360); // Normalize to 0-360 degrees
             }
+        }
+        if (collider instanceof BoundingBox) {
+            BoundingBox box = (BoundingBox) collider;
+            box.setBounds(position.getX() - box.getWidth() / 2, position.getY() - box.getHeight() / 2, box.getWidth(), box.getHeight());
+        } else if (collider instanceof BoundingCircle){
+            BoundingCircle circle = (BoundingCircle) collider;
+            circle.setBounds(position.getX(), position.getY(), circle.getRadius());
         }
     }
 
