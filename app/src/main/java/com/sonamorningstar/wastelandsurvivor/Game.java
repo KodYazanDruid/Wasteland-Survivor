@@ -3,6 +3,7 @@ package com.sonamorningstar.wastelandsurvivor;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -26,13 +27,17 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
     private final GameLoop gameLoop;
     private final Player player;
     private final Joystick joystick;
-
     public long ticks;
 
     private final List<Entity> entities = new CopyOnWriteArrayList<>();
 
+    public final Typeface edunReg;
+
+    public static Game INSTANCE;
+
     public Game(Context context) {
         super(context);
+        edunReg = getResources().getFont(R.font.edunreg);
         SurfaceHolder holder = getHolder();
         holder.addCallback(this);
         this.gameLoop = new GameLoop(this, holder);
@@ -144,6 +149,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         int color = ContextCompat.getColor(getContext(), R.color.purple_500);
         paint.setColor(color);
         paint.setTextSize(50);
+        paint.setTypeface(Game.INSTANCE.edunReg);
         canvas.drawText("UPS: " + averageUPS, 10, 40, paint);
     }
     public void drawFPS(Canvas canvas) {
@@ -152,6 +158,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         int color = ContextCompat.getColor(getContext(), R.color.purple_700);
         paint.setColor(color);
         paint.setTextSize(50);
+        paint.setTypeface(Game.INSTANCE.edunReg);
         canvas.drawText("FPS: " + averageFPS, 10, 100, paint);
     }
 }

@@ -14,8 +14,10 @@ public class ImageManager {
         if (!imageCache.containsKey(imageName)) {
             int resourceId = context.getResources().getIdentifier(imageName, "drawable", context.getPackageName());
             if (resourceId != 0) {
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inScaled = false;
                 imageCache.put(imageName, BitmapFactory.decodeResource(
-                        context.getResources(), resourceId));
+                        context.getResources(), resourceId, options));
             }
         }
         return imageCache.get(imageName);

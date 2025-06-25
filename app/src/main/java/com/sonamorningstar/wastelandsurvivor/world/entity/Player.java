@@ -28,8 +28,17 @@ public class Player extends LivingEntity {
     }
 
     @Override
-    public void update(Game game) {
-        super.update(game);
+    public void onCollision(Entity other) {
+        if (other instanceof ItemEntity) {
+            ItemEntity itemEntity = (ItemEntity) other;
+            // Handle item pickup logic here
+            // For example, add the item to the player's inventory
+            // playerInventory.add(itemEntity.getItemStack());
+            other.markedForRemoval = true;
+        } else if (other instanceof Enemy) {
+            // Handle collision with an enemy, e.g., take damage
+            this.hurt(10); // Example damage value
+        }
     }
 
     public void handleJoystick(Joystick joystick) {

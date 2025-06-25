@@ -55,6 +55,9 @@ public abstract class Entity {
 //        }
     }
 
+    public void onCollision(Entity other) {
+    }
+
     public void update(Game game) {
         updateMovement();
     }

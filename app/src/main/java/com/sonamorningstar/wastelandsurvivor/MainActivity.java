@@ -14,7 +14,10 @@ public class MainActivity extends GameActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-        setContentView(new Game(this));
+
+        Game game = new Game(this);
+        Game.INSTANCE = game;
+        setContentView(game);
 
     }
 }

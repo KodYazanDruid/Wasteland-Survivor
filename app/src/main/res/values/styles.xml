@@ -3,6 +3,7 @@
     <!-- Base application theme -->
     <style name="Theme.WastelandSurvivor.NoBar" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Other theme attributes -->
+        <item name="android:fontFamily">@font/editundo</item>
     </style>
 
     <!-- Fullscreen theme that hides system bars -->

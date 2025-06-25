@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 
 import com.sonamorningstar.wastelandsurvivor.Game;
-import com.sonamorningstar.wastelandsurvivor.GameLoop;
 import com.sonamorningstar.wastelandsurvivor.registry.ProjectileType;
 import com.sonamorningstar.wastelandsurvivor.world.BoundingBox;
 import com.sonamorningstar.wastelandsurvivor.world.entity.Entity;
