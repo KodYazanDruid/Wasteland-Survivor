@@ -52,6 +52,11 @@ public class BoundingBox implements Collider {
     }
 
     @Override
+    public BoundingBox getBoundingBox() {
+        return this;
+    }
+
+    @Override
     public void drawDebug(Canvas canvas) {
         Paint paint = new Paint();
         paint.setColor(0xFFFFFFFF);

@@ -1,7 +1,9 @@
-package com.sonamorningstar.wastelandsurvivor;
+package com.sonamorningstar.wastelandsurvivor.engine;
 
 import android.graphics.Canvas;
 import android.view.SurfaceHolder;
+
+import com.sonamorningstar.wastelandsurvivor.Game;
 
 public class GameLoop extends Thread {
     public static final double MAX_UPS = 60.0;

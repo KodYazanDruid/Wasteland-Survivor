@@ -18,6 +18,5 @@ public class MainActivity extends GameActivity {
         Game game = new Game(this);
         Game.INSTANCE = game;
         setContentView(game);
-
     }
 }

@@ -1,6 +1,5 @@
 package com.sonamorningstar.wastelandsurvivor.world.entity.projectile;
 
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
@@ -11,10 +10,11 @@ import com.sonamorningstar.wastelandsurvivor.R;
 import com.sonamorningstar.wastelandsurvivor.registry.ProjectileType;
 import com.sonamorningstar.wastelandsurvivor.world.BoundingCircle;
 import com.sonamorningstar.wastelandsurvivor.world.entity.Entity;
+import com.sonamorningstar.wastelandsurvivor.world.level.Level;
 
 public class BulletProjectile extends Projectile {
-    public BulletProjectile(Entity owner, Game game, Context context) {
-        super(ProjectileType.BULLET, game, owner, context, new BoundingCircle(0, 0, 5));
+    public BulletProjectile(Entity owner, Level level) {
+        super(ProjectileType.BULLET, level, owner, new BoundingCircle(0, 0, 5));
     }
 
     @Override
@@ -22,7 +22,7 @@ public class BulletProjectile extends Projectile {
         float x = (float) getPosition().getX();
         float y = (float) getPosition().getY();
         Paint paint = new Paint();
-        paint.setColor(ContextCompat.getColor(getContext(), R.color.purple_200));
+        paint.setColor(ContextCompat.getColor(Game.INSTANCE.getContext(), R.color.purple_200));
         canvas.drawRect(x, y, x + 10, y + 10, paint);
     }
 

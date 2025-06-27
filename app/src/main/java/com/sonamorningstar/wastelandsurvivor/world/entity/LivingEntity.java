@@ -4,11 +4,11 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
-import com.sonamorningstar.wastelandsurvivor.Game;
 import com.sonamorningstar.wastelandsurvivor.object.ItemStack;
 import com.sonamorningstar.wastelandsurvivor.world.BoundingBox;
 import com.sonamorningstar.wastelandsurvivor.world.BoundingCircle;
 import com.sonamorningstar.wastelandsurvivor.world.Collider;
+import com.sonamorningstar.wastelandsurvivor.world.level.Level;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -20,12 +20,34 @@ public abstract class LivingEntity extends Entity {
     protected final List<ItemStack> items = new CopyOnWriteArrayList<>();
     protected final List<ItemStack> charms = new CopyOnWriteArrayList<>();
 
-    public LivingEntity(Game game, Context context, Collider collider) {
-        super(game, context, collider);
+    public LivingEntity(Level level, Collider collider) {
+        super(level, collider);
+    }
+
+    public LivingEntity(Level level, Collider collider, double x, double y) {
+        super(level, collider, x, y);
+    }
+
+    @Override
+    public boolean isSolid() {
+        return false;
     }
 
     public void setMaxHealth(float maxHealth) {
         this.maxHealth = maxHealth;
+    }
+
+    public List<ItemStack> getItems() {
+        return items;
+    }
+    public void addItem(ItemStack stack) {
+        if (!stack.isEmpty()) items.add(stack);
+    }
+    public List<ItemStack> getCharms() {
+        return charms;
+    }
+    public void addCharm(ItemStack stack) {
+        if (!stack.isEmpty()) charms.add(stack);
     }
 
     @Override
@@ -58,8 +80,8 @@ public abstract class LivingEntity extends Entity {
     }
 
     @Override
-    public void addedToWorld(Game game) {
-        super.addedToWorld(game);
+    public void addedToWorld(Level level) {
+        super.addedToWorld(level);
         health = maxHealth;
     }
 

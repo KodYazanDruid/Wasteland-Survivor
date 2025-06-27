@@ -6,4 +6,6 @@ public interface Collider {
     boolean intersects(Collider other);
 
     void drawDebug(Canvas canvas);
+
+    BoundingBox getBoundingBox();
 }

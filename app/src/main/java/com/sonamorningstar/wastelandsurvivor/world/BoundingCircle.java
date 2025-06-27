@@ -40,6 +40,11 @@ public class BoundingCircle implements Collider {
     }
 
     @Override
+    public BoundingBox getBoundingBox() {
+        return new BoundingBox(centerX - radius, centerY - radius, radius * 2, radius * 2);
+    }
+
+    @Override
     public void drawDebug(Canvas canvas) {
         Paint paint = new Paint();
         paint.setColor(0xFFFFFFFF);
