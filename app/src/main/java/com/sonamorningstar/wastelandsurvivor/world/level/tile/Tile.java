@@ -1,4 +1,4 @@
-package com.sonamorningstar.wastelandsurvivor.world.level;
+package com.sonamorningstar.wastelandsurvivor.world.level.tile;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -40,6 +40,7 @@ public class Tile {
     private void initialize() {
         paint.setFilterBitmap(false);
         paint.setAntiAlias(false);
+        loadBitmaps();
     }
 
     public void loadBitmaps() {

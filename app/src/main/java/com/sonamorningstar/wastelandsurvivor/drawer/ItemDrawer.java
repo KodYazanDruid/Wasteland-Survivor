@@ -14,15 +14,17 @@ import com.sonamorningstar.wastelandsurvivor.object.ItemStack;
 
 public class ItemDrawer {
 
-    public static void drawItem(Canvas canvas, ItemStack stack, double x, double y) {
-        Bitmap image = ImageManager.getImage(Game.INSTANCE.getContext(), stack.getItem().getName().toLowerCase());
+    public static void drawItem(Canvas canvas, ItemStack stack, double x, double y, double size) {
+        Bitmap image = ImageManager.getImage(Game.INSTANCE.getContext(), stack.getItem().getName().toLowerCase().replace(" ", "_"));
         if (image != null) {
             Paint paint = new Paint();
             paint.setFilterBitmap(false);
             paint.setAntiAlias(false);
 
             double endX = x + image.getWidth() * 4;
+            endX *= size;
             double endY = y + image.getHeight() * 4;
+            endY *= size;
 
             Rect destRect = new Rect((int) x, (int) y, (int) endX, (int) endY);
             canvas.drawBitmap(image, null, destRect, paint);

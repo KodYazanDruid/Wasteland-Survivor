@@ -10,7 +10,7 @@ import com.sonamorningstar.wastelandsurvivor.world.entity.Entity;
 import com.sonamorningstar.wastelandsurvivor.world.entity.LivingEntity;
 import com.sonamorningstar.wastelandsurvivor.world.level.CollisionSide;
 import com.sonamorningstar.wastelandsurvivor.world.level.Level;
-import com.sonamorningstar.wastelandsurvivor.world.level.Tile;
+import com.sonamorningstar.wastelandsurvivor.world.level.tile.Tile;
 
 public class LaserProjectile extends Projectile {
 

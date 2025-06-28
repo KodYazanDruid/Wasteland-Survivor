@@ -2,6 +2,9 @@ package com.sonamorningstar.wastelandsurvivor.world.level;
 
 import android.graphics.Canvas;
 
+import com.sonamorningstar.wastelandsurvivor.world.level.levels.DesertLevel;
+import com.sonamorningstar.wastelandsurvivor.world.level.levels.ForestLevel;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,8 +16,8 @@ public class LevelManager {
     }
 
     public void setupLevels() {
-        registerLevel("Desert", new Level("Desert", 32, 32, "154875"));
-        registerLevel("Forest", new Level("Forest", 32, 32, "985154"));
+        registerLevel("Desert", new DesertLevel("Desert", 32, 32, "154875"));
+        registerLevel("Forest", new ForestLevel("Forest", 32, 32, "985154"));
         registerLevel("City", new Level("City", 32, 32,"356715"));
     }
 

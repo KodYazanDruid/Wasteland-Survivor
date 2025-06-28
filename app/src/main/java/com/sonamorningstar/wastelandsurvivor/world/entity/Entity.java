@@ -12,7 +12,7 @@ import com.sonamorningstar.wastelandsurvivor.world.Collider;
 import com.sonamorningstar.wastelandsurvivor.world.Position;
 import com.sonamorningstar.wastelandsurvivor.world.level.CollisionSide;
 import com.sonamorningstar.wastelandsurvivor.world.level.Level;
-import com.sonamorningstar.wastelandsurvivor.world.level.Tile;
+import com.sonamorningstar.wastelandsurvivor.world.level.tile.Tile;
 
 public abstract class Entity {
     protected String name;

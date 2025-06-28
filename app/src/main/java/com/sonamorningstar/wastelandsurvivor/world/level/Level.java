@@ -3,12 +3,15 @@ package com.sonamorningstar.wastelandsurvivor.world.level;
 import android.graphics.Canvas;
 
 import com.sonamorningstar.wastelandsurvivor.Game;
+import com.sonamorningstar.wastelandsurvivor.object.ItemStack;
 import com.sonamorningstar.wastelandsurvivor.registry.AllItems;
 import com.sonamorningstar.wastelandsurvivor.world.BoundingBox;
 import com.sonamorningstar.wastelandsurvivor.world.entity.Enemy;
 import com.sonamorningstar.wastelandsurvivor.world.entity.Entity;
 import com.sonamorningstar.wastelandsurvivor.world.entity.ItemEntity;
 import com.sonamorningstar.wastelandsurvivor.world.entity.Player;
+import com.sonamorningstar.wastelandsurvivor.world.level.tile.TickableTile;
+import com.sonamorningstar.wastelandsurvivor.world.level.tile.Tile;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -19,7 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Level {
     private final String name;
     private final String seed;
-    private final SecureRandom random;
+    protected final SecureRandom random;
 
     // Dimensions of the level in tiles
     private final int xLen;
@@ -29,6 +32,7 @@ public class Level {
     private Player player;
 
     private final Tile[][] tiles;
+    private final List<TickableTile> tickableTiles = new CopyOnWriteArrayList<>();
     int tileSize = 128;
 
     public Level(String name, int xLen, int yLen, String seed) {
@@ -37,7 +41,9 @@ public class Level {
         this.xLen = xLen;
         this.yLen = yLen;
         this.tiles = new Tile[xLen][yLen];
-        random = new SecureRandom(seed.getBytes());
+        random = new SecureRandom();
+        random.setSeed(seed.getBytes());
+
     }
 
     public int getXLen() {
@@ -52,36 +58,38 @@ public class Level {
         return tileSize;
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
+    public Tile[][] getTiles() {
+        return tiles;
+    }
+
+    public List<TickableTile> getTickableTiles() {
+        return tickableTiles;
+    }
+
     public void update() {
         for (Entity entity : entities) {
             if (!entity.markedForRemoval) entity.update(Game.INSTANCE);
             else entities.remove(entity);
         }
-    }
-
-    public void generateTiles() {
-        for (int i = 0; i < xLen; i++) {
-            for (int j = 0; j < yLen; j++) {
-                /*Tile tile;
-                if (i == 0 && j == 0) {
-                    tile = new Tile("sand", true);
-                } else {
-                    tile = random.nextBoolean() ? new Tile("sand", true) : new Tile("yellow_tree", "sand", false);
-                }*/
-                Tile tile = new Tile("grassy", true);
-                tile.setPosition(j * tileSize, i * tileSize);
-                tile.loadBitmaps();
-                tiles[i][j] = tile;
-            }
+        for (TickableTile tickableTile : tickableTiles) {
+            tickableTile.tick(this);
         }
     }
 
+    public void generateTiles() {
+
+    }
+
     public void bootstrapEntities() {
-        ItemEntity apple = new ItemEntity(AllItems.APPLE.createStack(1), this, 500, 500);
-        addEntity(apple);
-        Enemy enemy = new Enemy(this, 600, 600);
-        enemy.setTarget(player);
-        addEntity(enemy);
+
+    }
+
+    public void spawnItemOnWalkableTile(ItemStack stack) {
+
     }
 
     public void draw(Canvas canvas) {
@@ -163,6 +171,19 @@ public class Level {
             }
         }
         return tilesInRegion;
+    }
+
+    public List<Entity> getEntitiesAboveTile(Tile tile) {
+        List<Entity> entitiesAboveTile = new ArrayList<>();
+        if (tile == null) return entitiesAboveTile;
+
+        BoundingBox tileBox = tile.getCollision();
+        for (Entity entity : getEntities()) {
+            if (entity.getCollider().intersects(tileBox)) {
+                entitiesAboveTile.add(entity);
+            }
+        }
+        return entitiesAboveTile;
     }
 
     public List<Entity> getCollidingEntities(Entity entity) {

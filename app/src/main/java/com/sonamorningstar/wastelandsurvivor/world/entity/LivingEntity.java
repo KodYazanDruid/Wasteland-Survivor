@@ -1,31 +1,37 @@
 package com.sonamorningstar.wastelandsurvivor.world.entity;
 
-import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
-import com.sonamorningstar.wastelandsurvivor.object.ItemStack;
 import com.sonamorningstar.wastelandsurvivor.world.BoundingBox;
 import com.sonamorningstar.wastelandsurvivor.world.BoundingCircle;
 import com.sonamorningstar.wastelandsurvivor.world.Collider;
+import com.sonamorningstar.wastelandsurvivor.world.container.Inventory;
 import com.sonamorningstar.wastelandsurvivor.world.level.Level;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 public abstract class LivingEntity extends Entity {
+
     protected float health;
     protected float maxHealth = 100;
 
-    protected final List<ItemStack> items = new CopyOnWriteArrayList<>();
-    protected final List<ItemStack> charms = new CopyOnWriteArrayList<>();
+    protected Inventory itemInventory;
+    protected Inventory charmInventory;
 
     public LivingEntity(Level level, Collider collider) {
         super(level, collider);
+        initInventories();
     }
 
     public LivingEntity(Level level, Collider collider, double x, double y) {
         super(level, collider, x, y);
+        initInventories();
+    }
+
+    private void initInventories() {
+        // Default sizes, can be overridden by subclasses
+        this.itemInventory = new Inventory(27); // 3x9 grid
+        this.charmInventory = new Inventory(4);
     }
 
     @Override
@@ -37,17 +43,12 @@ public abstract class LivingEntity extends Entity {
         this.maxHealth = maxHealth;
     }
 
-    public List<ItemStack> getItems() {
-        return items;
+    public Inventory getItemInventory() {
+        return itemInventory;
     }
-    public void addItem(ItemStack stack) {
-        if (!stack.isEmpty()) items.add(stack);
-    }
-    public List<ItemStack> getCharms() {
-        return charms;
-    }
-    public void addCharm(ItemStack stack) {
-        if (!stack.isEmpty()) charms.add(stack);
+
+    public Inventory getCharmInventory() {
+        return charmInventory;
     }
 
     @Override

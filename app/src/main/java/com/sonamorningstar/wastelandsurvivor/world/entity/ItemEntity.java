@@ -22,6 +22,6 @@ public class ItemEntity extends Entity {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        ItemDrawer.drawItem(canvas, itemStack, getPosition().getX(), getPosition().getY());
+        ItemDrawer.drawItem(canvas, itemStack, getPosition().getX(), getPosition().getY(), 1);
     }
 }

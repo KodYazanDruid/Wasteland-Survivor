@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -37,7 +38,16 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         holder.addCallback(this);
         this.gameLoop = new GameLoop(this, holder);
         this.levelManager = new LevelManager();
-        this.joystick = new Joystick(250, 750, 250, 125);
+
+        DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
+        int height = displayMetrics.heightPixels;
+        int width = displayMetrics.widthPixels;
+        int outerRadius = width / 12;
+        int innerRadius = outerRadius / 2;
+        int joystickX = outerRadius + 60;
+        int joystickY = height - (outerRadius + 60);
+        this.joystick = new Joystick(joystickX, joystickY, outerRadius, innerRadius);
+
         this.player = new Player(levelManager.getCurrentLevel());
 
         setFocusable(true);
@@ -47,21 +57,25 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         return gameLoop.getDeltaTime();
     }
 
+    public LevelManager getLevelManager() {
+        return levelManager;
+    }
+
     public void update() {
         ticks++;
         joystick.update();
-        player.handleJoystick(joystick);
+        if (player != null) player.handleJoystick(joystick);
         if (levelManager.getCurrentLevel() != null) levelManager.getCurrentLevel().update();
     }
 
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
         levelManager.setupLevels();
-        Level currentLevel = levelManager.loadLevel("Desert"); // Load the initial level
-        player.changeLevel(currentLevel);
-        player.setPosition(new Position(128, 128));
-        currentLevel.addEntity(player);
+        Level currentLevel = levelManager.loadLevel("Forest"); // Load the initial level
         currentLevel.generateTiles();
+        player.changeLevel(currentLevel);
+        player.setPosition(new Position(256, 256));
+        currentLevel.addEntity(player);
         currentLevel.bootstrapEntities();
 
         gameLoop.startLoop();
@@ -107,10 +121,14 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
         if (levelManager.getCurrentLevel() != null) levelManager.getCurrentLevel().draw(canvas);
 
-        joystick.draw(canvas);
+        if(player != null) {
+            joystick.draw(canvas);
+            player.getItemInventory().draw(canvas, 50, 50);
+            player.getCharmInventory().draw(canvas, 50, 400);
+        }
 
-        drawUPS(canvas);
-        drawFPS(canvas);
+        /*drawUPS(canvas);
+        drawFPS(canvas);*/
     }
 
     public void drawUPS(Canvas canvas) {

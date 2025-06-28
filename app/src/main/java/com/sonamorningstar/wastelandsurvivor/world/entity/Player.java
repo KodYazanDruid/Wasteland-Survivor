@@ -41,7 +41,7 @@ public class Player extends LivingEntity {
             ItemEntity itemEntity = (ItemEntity) entity;
             itemEntity.markedForRemoval = true;
             ItemStack itemStack = itemEntity.getItemStack();
-            addItem(itemStack);
+            itemInventory.addItem(itemStack);
         }
     }
 
