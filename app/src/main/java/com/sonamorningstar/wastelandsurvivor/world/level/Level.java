@@ -4,11 +4,8 @@ import android.graphics.Canvas;
 
 import com.sonamorningstar.wastelandsurvivor.Game;
 import com.sonamorningstar.wastelandsurvivor.object.ItemStack;
-import com.sonamorningstar.wastelandsurvivor.registry.AllItems;
 import com.sonamorningstar.wastelandsurvivor.world.BoundingBox;
-import com.sonamorningstar.wastelandsurvivor.world.entity.Enemy;
 import com.sonamorningstar.wastelandsurvivor.world.entity.Entity;
-import com.sonamorningstar.wastelandsurvivor.world.entity.ItemEntity;
 import com.sonamorningstar.wastelandsurvivor.world.entity.Player;
 import com.sonamorningstar.wastelandsurvivor.world.level.tile.TickableTile;
 import com.sonamorningstar.wastelandsurvivor.world.level.tile.Tile;
@@ -25,8 +22,8 @@ public class Level {
     protected final SecureRandom random;
 
     // Dimensions of the level in tiles
-    private final int xLen;
-    private final int yLen;
+    private final int width; // Columns (X-axis)
+    private final int height; // Rows (Y-axis)
 
     private final List<Entity> entities = new CopyOnWriteArrayList<>();
     private Player player;
@@ -35,23 +32,23 @@ public class Level {
     private final List<TickableTile> tickableTiles = new CopyOnWriteArrayList<>();
     int tileSize = 128;
 
-    public Level(String name, int xLen, int yLen, String seed) {
+    public Level(String name, int width, int height, String seed) {
         this.name = name;
         this.seed = seed;
-        this.xLen = xLen;
-        this.yLen = yLen;
-        this.tiles = new Tile[xLen][yLen];
+        this.width = width;
+        this.height = height;
+        // Standard: [rows][columns] -> [height][width]
+        this.tiles = new Tile[this.height][this.width];
         random = new SecureRandom();
         random.setSeed(seed.getBytes());
-
     }
 
-    public int getXLen() {
-        return xLen;
+    public int getWidth() {
+        return width;
     }
 
-    public int getYLen() {
-        return yLen;
+    public int getHeight() {
+        return height;
     }
 
     public int getTileSize() {
@@ -102,11 +99,20 @@ public class Level {
             cameraY = player.getPosition().getY() - canvas.getHeight() / 2.0;
         }
 
-        double levelWidth = this.xLen * this.tileSize;
-        double levelHeight = this.yLen * this.tileSize;
+        double levelWidth = this.width * this.tileSize;
+        double levelHeight = this.height * this.tileSize;
 
-        cameraX = Math.max(0.0, Math.min(cameraX, levelWidth - canvas.getWidth()));
-        cameraY = Math.max(0.0, Math.min(cameraY, levelHeight - canvas.getHeight()));
+        if (levelWidth < canvas.getWidth()) {
+            cameraX = (levelWidth - canvas.getWidth()) / 2.0;
+        } else {
+            cameraX = Math.max(0.0, Math.min(cameraX, levelWidth - canvas.getWidth()));
+        }
+
+        if (levelHeight < canvas.getHeight()) {
+            cameraY = (levelHeight - canvas.getHeight()) / 2.0;
+        } else {
+            cameraY = Math.max(0.0, Math.min(cameraY, levelHeight - canvas.getHeight()));
+        }
 
         canvas.translate((float) -cameraX, (float) -cameraY);
 
@@ -115,10 +121,10 @@ public class Level {
         int startRow = (int) (cameraY / tileSize);
         int endRow = (int) ((cameraY + canvas.getHeight()) / tileSize) + 1;
 
-        startCol = Math.max(0, startCol);
         startRow = Math.max(0, startRow);
-        endCol = Math.min(tiles[0].length, endCol);
-        endRow = Math.min(tiles.length, endRow);
+        startCol = Math.max(0, startCol);
+        endRow = Math.min(height, endRow);
+        endCol = Math.min(width, endCol);
 
         for (int i = startRow; i < endRow; i++) {
             for (int j = startCol; j < endCol; j++) {
@@ -162,8 +168,8 @@ public class Level {
         // Clamp values to be within the grid bounds
         startX = Math.max(0, startX);
         startY = Math.max(0, startY);
-        endX = Math.min(tiles[0].length - 1, endX);
-        endY = Math.min(tiles.length - 1, endY);
+        endX = Math.min(width - 1, endX);
+        endY = Math.min(height - 1, endY);
 
         for (int i = startY; i <= endY; i++) {
             for (int j = startX; j <= endX; j++) {

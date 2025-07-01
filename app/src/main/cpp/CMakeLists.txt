@@ -30,3 +30,5 @@ target_link_libraries(wastelandsurvivor
         jnigraphics
         android
         log)
+
+target_link_libraries(wastelandsurvivor game-activity::game-activity_static)

@@ -46,11 +46,21 @@ public class Player extends LivingEntity {
     }
 
     public void handleJoystick(Joystick joystick) {
-        setDeltaMovement(joystick.getActuatorX() * moveSpeed, joystick.getActuatorY() * moveSpeed);
+        setDeltaMovement(joystick.getActuatorX() * speed, joystick.getActuatorY() * speed);
     }
 
     public void fireProjectile(float x, float y) {
         LaserProjectile laser = new LaserProjectile(this, level, getPosition().getX() - ((BoundingCircle) collider).getRadius(), getPosition().getY());
         level.addEntity(laser);
+    }
+
+    @Override
+    public void addedToWorld(Level level) {
+        super.addedToWorld(level);
+        for (Entity entity : level.getEntities()) {
+            if (entity instanceof Enemy) {
+                ((Enemy) entity).setTarget(this);
+            }
+        }
     }
 }

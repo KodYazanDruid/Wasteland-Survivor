@@ -25,7 +25,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
     private final LevelManager levelManager;
     public final Player player;
-    private final Joystick joystick;
+    public final Joystick joystick;
 
     public final Typeface edunReg;
 
@@ -53,10 +53,6 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         setFocusable(true);
     }
 
-    public double getDeltaTime() {
-        return gameLoop.getDeltaTime();
-    }
-
     public LevelManager getLevelManager() {
         return levelManager;
     }
@@ -66,17 +62,17 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         joystick.update();
         if (player != null) player.handleJoystick(joystick);
         if (levelManager.getCurrentLevel() != null) levelManager.getCurrentLevel().update();
+        System.out.println("Player Speed: " + player.getSpeed());
+        System.out.println("Joystick Actuator X: " + joystick.getActuatorX() + ", Y: " + joystick.getActuatorY());
     }
 
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
         levelManager.setupLevels();
-        Level currentLevel = levelManager.loadLevel("Forest"); // Load the initial level
-        currentLevel.generateTiles();
+        Level currentLevel = levelManager.loadLevel("Desert"); // Load the initial level
         player.changeLevel(currentLevel);
         player.setPosition(new Position(256, 256));
         currentLevel.addEntity(player);
-        currentLevel.bootstrapEntities();
 
         gameLoop.startLoop();
     }
@@ -99,6 +95,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
                     player.fireProjectile(event.getX(), event.getY());
                 } else if (joystick.checkPressed(event.getX(), event.getY())) {
                     joystick.setPressed(true);
+                    joystick.setActuator(event.getX(), event.getY());
                 } else player.fireProjectile(event.getX(), event.getY());
                 return true;
             case MotionEvent.ACTION_MOVE:
@@ -127,8 +124,8 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
             player.getCharmInventory().draw(canvas, 50, 400);
         }
 
-        /*drawUPS(canvas);
-        drawFPS(canvas);*/
+        drawUPS(canvas);
+        drawFPS(canvas);
     }
 
     public void drawUPS(Canvas canvas) {

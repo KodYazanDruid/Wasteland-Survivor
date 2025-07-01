@@ -6,15 +6,16 @@ import android.view.SurfaceHolder;
 import com.sonamorningstar.wastelandsurvivor.Game;
 
 public class GameLoop extends Thread {
-    public static final double MAX_UPS = 60.0;
-    private static final double UPS_PERIOD = 1E+3 / MAX_UPS;
+    public static final int MAX_UPS = 60;
+    public static final int MAX_FPS = 60;
+    private static final double UPS_PERIOD = 1_000_000_000.0 / MAX_UPS;
+    private static final double FPS_PERIOD = 1_000_000_000.0 / MAX_FPS;
     private boolean isRunning;
     private final Game game;
     private final SurfaceHolder surfaceHolder;
 
     private double averageUPS;
     private double averageFPS;
-    private double deltaTime;
 
     public GameLoop(Game game, SurfaceHolder holder) {
         this.game = game;
@@ -29,10 +30,6 @@ public class GameLoop extends Thread {
         return averageFPS;
     }
 
-    public double getDeltaTime() {
-        return deltaTime;
-    }
-
     public void startLoop() {
         isRunning = true;
         start();
@@ -40,67 +37,51 @@ public class GameLoop extends Thread {
 
     @Override
     public void run() {
-        super.run();
+        long previousTime = System.nanoTime();
 
-        int updateCount = 0;
-        int frameCount = 0;
+        int frames = 0;
+        int updates = 0;
+        long lastCheck = System.currentTimeMillis();
 
-        long startTime;
-        long elapsedTime;
-        long sleepTime;
+        double deltaU = 0;
+        double deltaF = 0;
 
-        //Game loop logic.
-        Canvas canvas = null;
-
-        startTime = System.currentTimeMillis();
         while (isRunning) {
-            try {
-                canvas = surfaceHolder.lockCanvas();
-                synchronized (surfaceHolder) {
-                    game.update();
-                    updateCount++;
-                }
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-            } finally {
-                if (canvas != null) {
-                    try {
+            long now = System.nanoTime();
+            deltaU += (now - previousTime) / UPS_PERIOD;
+            deltaF += (now - previousTime) / FPS_PERIOD;
+            previousTime = now;
+
+            if (deltaU >= 1.0) {
+                game.update();
+                updates++;
+                deltaU--;
+            }
+
+            if (deltaF >= 1.0) {
+                Canvas canvas = null;
+                try {
+                    canvas = surfaceHolder.lockCanvas();
+                    synchronized (surfaceHolder) {
                         game.draw(canvas);
-                        frameCount++;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
+                        frames++;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (canvas != null) {
                         surfaceHolder.unlockCanvasAndPost(canvas);
                     }
                 }
+                deltaF--;
             }
 
-            elapsedTime = System.currentTimeMillis() - startTime;
-            sleepTime = (long) (updateCount * UPS_PERIOD - elapsedTime);
-            if (sleepTime > 0) {
-                try {
-                    sleep(sleepTime);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            while (sleepTime < 0 && updateCount < MAX_UPS-1) {
-                game.update();
-                updateCount++;
-                elapsedTime = System.currentTimeMillis() - startTime;
-                sleepTime = (long) (updateCount * UPS_PERIOD - elapsedTime);
-            }
-
-
-            elapsedTime = System.currentTimeMillis() - startTime;
-            deltaTime = elapsedTime;
-            if (elapsedTime >= 1000) {
-                averageUPS = updateCount / (elapsedTime * 1E-3);
-                averageFPS = frameCount / (elapsedTime * 1E-3);
-                updateCount = 0;
-                frameCount = 0;
-                startTime = System.currentTimeMillis();
+            if (System.currentTimeMillis() - lastCheck >= 1000) {
+                lastCheck = System.currentTimeMillis();
+                averageFPS = frames;
+                averageUPS = updates;
+                frames = 0;
+                updates = 0;
             }
         }
     }

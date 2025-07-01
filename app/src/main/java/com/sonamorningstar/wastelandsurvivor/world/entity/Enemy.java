@@ -32,8 +32,8 @@ public class Enemy extends LivingEntity {
         super.update(game);
         if (target instanceof Player) {
             double dist = getDistance(target);
-            setDeltaMovement((target.getPosition().getX() - position.getX()) / dist * moveSpeed * 0.6,
-                             (target.getPosition().getY() - position.getY()) / dist * moveSpeed * 0.6);
+            setDeltaMovement((target.getPosition().getX() - position.getX()) / dist * speed * 0.6,
+                             (target.getPosition().getY() - position.getY()) / dist * speed * 0.6);
         }
     }
 

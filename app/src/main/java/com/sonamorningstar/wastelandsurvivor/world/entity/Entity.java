@@ -22,8 +22,7 @@ public abstract class Entity {
     // 0: left, 90: up, 180: right, 270: down
     private double rotation = 0; // Rotation in degrees (0-360), Counter-clockwise.
 
-    protected double speed = 200; // Speed of the player in pixels per second
-    protected double moveSpeed = speed / GameLoop.MAX_UPS; // Maximum speed of the player
+    protected final double speed = 20; // Speed of the player in pixels per second
 
     protected double velocityX = 0;
     protected double velocityY = 0;
@@ -51,6 +50,7 @@ public abstract class Entity {
 
     public void changeLevel(Level level) {
         this.level = level;
+        updateMovement();
     }
 
     public Level getLevel() { return level; }
@@ -122,7 +122,7 @@ public abstract class Entity {
 
             boolean collisionX = false;
 
-            double levelWidth = level.getYLen() * level.getTileSize();
+            double levelWidth = level.getWidth() * level.getTileSize();
             BoundingBox box = getCollider().getBoundingBox();
             if (box.getX() < 0 || (box.getX() + box.getWidth()) > levelWidth) {
                 onTileCollision(null, (velocityX > 0) ? CollisionSide.LEFT : CollisionSide.RIGHT);
@@ -170,7 +170,7 @@ public abstract class Entity {
 
             boolean collisionY = false;
 
-            double levelHeight = level.getXLen() * level.getTileSize();
+            double levelHeight = level.getHeight() * level.getTileSize();
             BoundingBox box = getCollider().getBoundingBox();
             if (box.getY() < 0 || (box.getY() + box.getHeight()) > levelHeight) {
                 onTileCollision(null, (velocityY > 0) ? CollisionSide.TOP : CollisionSide.BOTTOM);
@@ -225,14 +225,8 @@ public abstract class Entity {
         this.position = position;
     }
 
-    public void setSpeed(double speed) {
-        this.speed = speed;
-    }
     public double getSpeed() {
         return speed;
-    }
-    public double getMoveSpeed() {
-        return moveSpeed;
     }
 
     public void setDeltaMovement(double deltaX, double deltaY) {

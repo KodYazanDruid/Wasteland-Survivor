@@ -52,7 +52,7 @@ public class LaserProjectile extends Projectile {
     @Override
     public void update(Game game) {
         if (velocityX == 0 && velocityY == 0) {
-            double speed = 10.0; // Projectile speed
+            double speed = 30.0; // Projectile speed
             double angleRadians = Math.toRadians(getRotation());
             double deltaX = -Math.cos(angleRadians) * speed;
             double deltaY = -Math.sin(angleRadians) * speed;

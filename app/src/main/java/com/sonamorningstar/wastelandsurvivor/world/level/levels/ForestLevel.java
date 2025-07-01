@@ -6,64 +6,28 @@ import com.sonamorningstar.wastelandsurvivor.world.entity.Enemy;
 import com.sonamorningstar.wastelandsurvivor.world.entity.ItemEntity;
 import com.sonamorningstar.wastelandsurvivor.world.level.Level;
 import com.sonamorningstar.wastelandsurvivor.world.level.tile.TeleporterTile;
-import com.sonamorningstar.wastelandsurvivor.world.level.tile.TickableTile;
 import com.sonamorningstar.wastelandsurvivor.world.level.tile.Tile;
 
 public class ForestLevel extends Level {
-    public ForestLevel(String name, int xLen, int yLen, String seed) {
-        super(name, xLen, yLen, seed);
+    public ForestLevel(String name, int width, int height, String seed) {
+        super(name, width, height, seed);
     }
 
     @Override
     public void generateTiles() {
-        // Base fill with grass
-        for (int i = 0; i < getXLen(); i++) {
-            for (int j = 0; j < getYLen(); j++) {
-                getTiles()[i][j] = new Tile("grass", true);
+        for (int i = 0; i < getHeight(); i++) {
+            for (int j = 0; j < getWidth(); j++) {
+                Tile tile = i == 0 || j == 0 || i == getHeight() - 1 || j == getWidth() - 1 ?
+                        new Tile("green_tree", "grass", false) : new Tile("grass", true);
+                tile.setPosition(j * getTileSize(), i * getTileSize());
+                getTiles()[i][j] = tile;
             }
         }
 
-        for (int i = 0; i < getXLen(); i++) {
-            for (int j = 0; j < getYLen(); j++) {
-                if (i == 0 || j == 0 || i == getXLen() - 1 || j == getYLen() - 1) {
-                    getTiles()[i][j] = new Tile("green_tree", "grass", false);
-                }
-            }
-        }
-
-        for (int i = 1; i < getXLen() - 1; i++) {
-            for (int j = 1; j < getYLen() - 1; j++) {
-                double noise = random.nextDouble();
-                if (noise < 0.2) {
-                    getTiles()[i][j] = new Tile("dirt", "grass", true);
-                } else if (noise > 0.9) {
-                    getTiles()[i][j] = new Tile("green_tree", "grass", false);
-                } else if (noise > 0.98) {
-                    getTiles()[i][j] = new Tile("rock_mossy", "grass", false);
-                }
-            }
-        }
-
-        int clearX = 5;
-        int clearY = 5;
-        for (int i = clearX - 1; i <= clearX + 1; i++) {
-            for (int j = clearY - 1; j <= clearY + 1; j++) {
-                if (i > 0 && i < getXLen() - 1 && j > 0 && j < getYLen() - 1) {
-                    getTiles()[i][j] = new Tile("grass", true);
-                }
-            }
-        }
-
-        getTiles()[clearX][clearY] = new TeleporterTile("yellow_tree", "grass", true);
-
-        for (int i = 0; i < getXLen(); i++) {
-            for (int j = 0; j < getYLen(); j++) {
-                getTiles()[i][j].setPosition(j * getTileSize(), i * getTileSize());
-                if (getTiles()[i][j] instanceof TickableTile) {
-                    getTickableTiles().add(((TickableTile) getTiles()[i][j]));
-                }
-            }
-        }
+        var teleporter = new TeleporterTile("yellow_tree", "grass", true, "Highway");
+        teleporter.setPosition(3 * 128, 3 * 128);
+        getTiles()[3][3] = teleporter;
+        getTickableTiles().add(teleporter);
     }
 
     @Override
@@ -83,8 +47,8 @@ public class ForestLevel extends Level {
     public void spawnItemOnWalkableTile(ItemStack stack) {
         int x, y;
         do {
-            x = random.nextInt(getYLen());
-            y = random.nextInt(getXLen());
+            x = random.nextInt(getHeight());
+            y = random.nextInt(getWidth());
         } while (!getTiles()[y][x].isWalkable());
 
         int pixelX = x * getTileSize() + getTileSize() / 2;
@@ -95,16 +59,13 @@ public class ForestLevel extends Level {
     private void spawnEnemyOnWalkableTile() {
         int x, y;
         do {
-            x = random.nextInt(getYLen());
-            y = random.nextInt(getXLen());
+            x = random.nextInt(getHeight());
+            y = random.nextInt(getWidth());
         } while (!getTiles()[y][x].isWalkable());
 
         int pixelX = x * getTileSize() + getTileSize() / 2;
         int pixelY = y * getTileSize() + getTileSize() / 2;
         Enemy enemy = new Enemy(this, pixelX, pixelY);
-        if (getPlayer() != null) {
-            enemy.setTarget(getPlayer());
-        }
         addEntity(enemy);
     }
 }

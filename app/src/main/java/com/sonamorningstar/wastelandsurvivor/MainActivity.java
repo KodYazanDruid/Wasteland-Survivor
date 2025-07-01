@@ -1,5 +1,6 @@
 package com.sonamorningstar.wastelandsurvivor;
 
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
@@ -18,5 +19,15 @@ public class MainActivity extends GameActivity {
         Game game = new Game(this);
         Game.INSTANCE = game;
         setContentView(game);
+
+    }
+
+    @Override
+    protected void onPause() {
+        SharedPreferences sp = getSharedPreferences("WastelandSurvivor", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("lastActivity", MainActivity.class.getCanonicalName());
+        editor.commit();
+        super.onPause();
     }
 }

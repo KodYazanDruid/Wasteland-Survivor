@@ -16,7 +16,7 @@ public class Tile {
     private BoundingBox bBox;
     private boolean dirty = false;
 
-    private int x,y;
+    protected int x,y;
 
     private Bitmap image;
     private Bitmap backgroundImage;
@@ -54,6 +54,10 @@ public class Tile {
 
     public String getName() {
         return name;
+    }
+
+    public String getBackgroundTile() {
+        return backgroundTile;
     }
 
     public boolean isWalkable() {
